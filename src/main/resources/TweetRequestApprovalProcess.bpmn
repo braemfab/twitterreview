@@ -235,13 +235,6 @@
       </bpmn:extensionElements>
       <bpmn:outgoing>Flow_0by82jn</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:scriptTask id="AufVerboteneWorterPrufenTask" name="Auf verbotene Wörter prüfen" scriptFormat="JavaScript">
-      <bpmn:incoming>Flow_0zq3832</bpmn:incoming>
-      <bpmn:outgoing>Flow_0r4gqap</bpmn:outgoing>
-      <bpmn:script>tc = execution.getVariable("tweetContent");
-var result = tc.toLowerCase().indexOf("gpi");
-execution.setVariable("checkResult", (result !== -1 ? "rejected" : "manualCheckRequired"));</bpmn:script>
-    </bpmn:scriptTask>
     <bpmn:userTask id="TweetAnfragePrufenTask1" name="Tweet-Anfrage prüfen" camunda:candidateGroups="kommabt">
       <bpmn:extensionElements>
         <camunda:formData>
@@ -282,6 +275,16 @@ execution.setVariable("checkResult", (result !== -1 ? "rejected" : "manualCheckR
       <bpmn:incoming>ZuUberarbeitenSequenceFlow1</bpmn:incoming>
       <bpmn:outgoing>Flow_0rp82z6</bpmn:outgoing>
     </bpmn:userTask>
+    <bpmn:businessRuleTask id="AufVerboteneWorterPrufenTask" name="Tweet-Text automatisch prüfen" camunda:asyncAfter="true" camunda:decisionRef="TweetContentValidation">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="checkResult">${decisionResult.getSingleResult().result}</camunda:outputParameter>
+          <camunda:outputParameter name="checkResultComment">${decisionResult.getSingleResult().comment}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0zq3832</bpmn:incoming>
+      <bpmn:outgoing>Flow_0r4gqap</bpmn:outgoing>
+    </bpmn:businessRuleTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1rw4mjy">
@@ -606,14 +609,14 @@ execution.setVariable("checkResult", (result !== -1 ? "rejected" : "manualCheckR
           <dc:Bounds x="232" y="768" width="87" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1pazufm_di" bpmnElement="AufVerboteneWorterPrufenTask">
-        <dc:Bounds x="520" y="858" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1y7lkd7_di" bpmnElement="TweetAnfragePrufenTask1">
         <dc:Bounds x="823" y="1094" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1bhyf9j_di" bpmnElement="TweetUberarbeitenTask1">
         <dc:Bounds x="1184" y="713" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_14mwp54_di" bpmnElement="AufVerboteneWorterPrufenTask">
+        <dc:Bounds x="520" y="858" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Participant_1sjyo88_di" bpmnElement="MicrosoftActiveDirectoryParticipant" isHorizontal="true">
         <dc:Bounds x="160" y="1260" width="300" height="60" />
