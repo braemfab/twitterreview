@@ -1,8 +1,14 @@
 package ch.zhaw.gpi.twitterreview;
 
 import org.camunda.bpm.spring.boot.starter.annotation.EnableProcessApplication;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import ch.zhaw.gpi.twitterreview.ldap.LdapService;
+import ch.zhaw.gpi.twitterreview.ldap.User;
+import ch.zhaw.gpi.twitterreview.ldap.UserRepository;
 
 /**
  * Hauptklasse für die Prozessapplikation, welche diese mit allen Abhängigkeiten
@@ -20,7 +26,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 @EnableProcessApplication
-public class CamundaProcessApplication {
+public class CamundaProcessApplication implements CommandLineRunner {
 
     /**
      * Haupt-Methode, welche beim Run-Befehl eine
@@ -30,5 +36,11 @@ public class CamundaProcessApplication {
      */
     public static void main(String[] args) {
         SpringApplication.run(CamundaProcessApplication.class, args);
+
+    }
+
+    @Override
+    public void run(String... args) throws Exception{
+
     }
 }
