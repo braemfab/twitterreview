@@ -5,29 +5,37 @@ import javax.inject.Named;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
-import ch.zhaw.gpi.twitterreview.ldap.LdapService;
+
 
 @Named("getUserInformationAdapter")
 public class GetUserInformationDelegate implements JavaDelegate {
 
-    @Autowired
-    private LdapService ldapService;
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         String userName = (String) execution.getVariable("anfrageStellenderBenutzer");
 
-        String userAsJsonString = ldapService.getUser(userName);
+        RestTemplate restTemplate = new RestTemplate();
 
-        JSONObject userAsJsonObject = new JSONObject(userAsJsonString);
+        ResponseEntity<String> response = restTemplate.exchange("http://localhost:8070/api/users/{userName}", HttpMethod.GET, null, String.class, userName);
 
-        execution.setVariable("userEmail", userAsJsonObject.getString("email"));
+        String fullName;
 
-        String fullName = userAsJsonObject.getString("firstName") + " " + userAsJsonObject.getString("officialName");
+        if(response.getStatusCode().equals(HttpStatus.OK)){
+            JSONObject userAJsonObject = new JSONObject(response.getBody());
+            fullName = userAJsonObject.getString("firstName") + " " + userAJsonObject.getString("officialName");
+            execution.setVariable("email", userAJsonObject.getString("email"));
+        } else {
+            fullName = "Mr. X";
+        }
 
         execution.setVariable("userFullName", fullName);
+
     }
     
 }
